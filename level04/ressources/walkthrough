@@ -1,0 +1,10 @@
+level04@OverRide:~$ ./level04
+Give me some shellcode, k
+1
+child is exiting...
+level04@OverRide:~$
+
+➜  override git:(main) ✗ scp -P 4242 level04@192.168.1.28:/home/users/level04/level04 ./bin/.
+
+decompilation
+

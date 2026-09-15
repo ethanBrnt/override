@@ -1,0 +1,36 @@
+level06@OverRide:~$ ./level06
+***********************************
+*               level06           *
+***********************************
+-> Enter Login: level
+***********************************
+***** NEW ACCOUNT DETECTED ********
+***********************************
+-> Enter Serial: l
+level06@OverRide:~$
+
+➜  override git:(main) ✗ scp -P 4242 $level@192.168.1.28:/home/users/$level/$level ./bin/.
+
+https://dogbolt.org/?id=9f72fea8-183c-4bdc-9620-b88449bc2ae1#Boomerang=8&Ghidra=221&Hex-Rays=166&angr=63&Relyze=1&RetDec=22&Snowman=8332&BinaryNinja=176
+decompilation
+
+apres avoir jouer avec le code source je comprend qu'en affichant simplement 
+	le calcul effectuer par le programme en utilisant mon login eburnet
+	le serial calculer est 6233769 donc j'ai juste a utiliser les memes infos 
+	en etant sur la machine.
+
+level06@OverRide:~$ ./level06
+***********************************
+*               level06           *
+***********************************
+-> Enter Login: eburnet
+***********************************
+***** NEW ACCOUNT DETECTED ********
+***********************************
+-> Enter Serial: 6233769
+Authenticated!
+$ whoami
+level07
+$ cat /home/users/level07/.pass
+GbcPDRgsFK77LNnnuh7QyFYA2942Gp8yKj9KrWD8
+$

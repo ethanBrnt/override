@@ -9,9 +9,9 @@ void decrypt(int key) {
 	
 	int len = strlen(buffer);
 	for (int i = 0; i < len; ++i) {
-		buffer[i] = buffer[i] ^ key;; // Opération XOR bit à bit
+		buffer[i] = buffer[i] ^ key; // Opération XOR bit à bit
 	}
-	
+
 	if (strcmp(buffer, "Congratulations!") == 0) {
 		system("/bin/sh");
 	} else {

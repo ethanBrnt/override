@@ -19,18 +19,38 @@ Puis un OU logique seras appliquer a "Q}|u`sfg~sf{}|a3" et il faut
 strcpy(buffer, "Q}|u`sfg~sf{}|a3");
 if (strcmp(buffer, "Congratulations!") == 0)
 
+
+"Q}|u`sfg~sf{}|a3"
+Q premiere lettre de la string de base
+
+"Congratulations!"
+C premiere lettre transformer
+
 buf + key = res
  Q  +     =  C
 
+En binaire:
 01010001 + ? = 01000011
 
 Q= 01010001
 C= 01000011
    00010010 = 18
 
+18 est donc la valeur de difference entre la string original et la string attendu.
+
+Valeur (322424845) a laquel on vas soustraire une autre valeur qui doit donner 18.
 322424845 - ? = 18
 
-322424845 - 18 = 322424827 donc 322424845 - 322424827 = 18
+322424845 - 18 = 322424827 
+donc 322424845 - 322424827 = 18
+
+on donne donc 322424827 comme mdp qui se fait soustraire
+322424845 - 322424827 = 18
+
+Puis passe dans les cases attendue 18
+
+
+
 
 level03@OverRide:~$ ./level03
 ***********************************

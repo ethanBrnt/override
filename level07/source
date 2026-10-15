@@ -81,7 +81,7 @@ int main(int argc, char **argv, char **envp)
         status = 1;
 
         fgets(command, sizeof(command), stdin);
-        command[strcspn(command, "\r\n")] = '\0'; // Remplace le \n par \0
+        command[strcspn(command, "\r\n")] = '\0';
 
         if (memcmp(command, "store", 5) == 0)
             status = store_number(storage);

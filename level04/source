@@ -1,51 +1,51 @@
 int32_t main(int32_t argc, char** argv, char** envp)
 {
-    pid_t child_pid = fork();
-    char shellcode_buf[128]; // [esp+20h] [ebp-98h] BYREF
-    int32_t status = 0;
+	pid_t child_pid = fork();
+	char shellcode_buf[128]; // [esp+20h] [ebp-98h] BYREF
+	int32_t status = 0;
 
-    memset(shellcode_buf, 0, sizeof(shellcode_buf));
+	memset(shellcode_buf, 0, sizeof(shellcode_buf));
 
-    // Code exécuté uniquement par le processus parent
-    if (child_pid > 0)
-    {
-        while (true)
-        {
-            // Attend qu'un changement d'état ou un événement survienne chez le processus enfant
-            wait(&status);
-            
-            // Vérifie si l'enfant s'est arrêté normalement ou suite à un signal
-            if (WIFEXITED(status) || WIFSIGNALED(status))
-            {
-                puts("child is exiting...");
-                break;
-            }
-            
-            // Inspecte le registre de l'enfant pour voir quel appel système il s'apprête à faire (ici : vérifie si c'est execve)
-            if (ptrace(PTRACE_PEEKUSER, child_pid, 4 * ORIG_EAX, NULL) != SYS_execve)
-            {
-                continue; // Si ce n'est pas execve, on reprend la surveillance
-            }
-            
-            // Si l'enfant tente d'exécuter execve, le parent bloque l'action, l'affiche et le tue
-            puts("no exec() for you");
-            kill(child_pid, SIGKILL);
-            break;
-        }
-    }
-    // Code exécuté uniquement par le processus enfant
-    else if (child_pid == 0)
-    {
-        // Demande à ce que l'enfant reçoive un signal si le processus parent vient à mourir
-        prctl(PR_SET_PDEATHSIG, SIGHUP);
-        
-        // Autorise le processus parent à tracer et surveiller ce processus enfant
-        ptrace(PTRACE_TRACEME, 0, NULL, NULL);
-        
-        // Affiche un message d'invite et lit l'entrée de l'utilisateur dans le buffer
-        puts("Give me some shellcode, k");
-        gets(shellcode_buf);
-    }
-    
-    return 0;
+	// Code exécuté uniquement par le processus parent
+	if (child_pid > 0)
+	{
+		while (true)
+		{
+			// Attend qu'un changement d'état ou un événement survienne chez le processus enfant
+			wait(&status);
+			
+			// Vérifie si l'enfant s'est arrêté normalement ou suite à un signal
+			if (WIFEXITED(status) || WIFSIGNALED(status))
+			{
+				puts("child is exiting...");
+				break;
+			}
+			
+			// Inspecte le registre de l'enfant pour voir quel appel système il s'apprête à faire (ici : vérifie si c'est execve)
+			if (ptrace(PTRACE_PEEKUSER, child_pid, 4 * ORIG_EAX, NULL) != SYS_execve)
+			{
+				continue; // Si ce n'est pas execve, on reprend la surveillance
+			}
+			
+			// Si l'enfant tente d'exécuter execve, le parent bloque l'action, l'affiche et le tue
+			puts("no exec() for you");
+			kill(child_pid, SIGKILL);
+			break;
+		}
+	}
+	// Code exécuté uniquement par le processus enfant
+	else if (child_pid == 0)
+	{
+		// Demande à ce que l'enfant reçoive un signal si le processus parent vient à mourir
+		prctl(PR_SET_PDEATHSIG, SIGHUP);
+		
+		// Autorise le processus parent à tracer et surveiller ce processus enfant
+		ptrace(PTRACE_TRACEME, 0, NULL, NULL);
+		
+		// Affiche un message d'invite et lit l'entrée de l'utilisateur dans le buffer
+		puts("Give me some shellcode, k");
+		gets(shellcode_buf);
+	}
+	
+	return 0;
 }

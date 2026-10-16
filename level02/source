@@ -22,7 +22,6 @@
 		if ( v7 != 41 )
 		{
 			fwrite("ERROR: failed to read password file\n", 1u, 0x24u, stderr);
-			fwrite("ERROR: failed to read password file\n", 1u, 0x24u, stderr);
 			exit(1);
 		}
 		fclose(stream);

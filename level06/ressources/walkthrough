@@ -18,10 +18,9 @@ execution du code sur la machine hote en ajoutant la ligne
 		printf("cal: %d\n", calculated_serial);
 
 
-apres avoir jouer avec le code source je comprend qu'en affichant simplement le calcul effectuer par le programme:
-en utilisant mon login "eburnet"
+apres avoir jouer avec le code source je comprend qu'en affichant simplement le calcul effectuer par le programme en utilisant mon login "eburnet"
 le serial calculer par le programme est "6233769"
-et si le serial entree par l'utilisateur est le meme que celui calculer par le programme alors on a acces au shell
+et si le serial entree par l'utilisateur est le meme que celui calculer par le programme alors on a acces au shell:
 		return serial != calculated_serial;
 return false et donc acces a "system("/bin/sh");"
 

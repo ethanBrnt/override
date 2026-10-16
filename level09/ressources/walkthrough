@@ -146,26 +146,18 @@ gs             0x0      0
 0x7fffffffe5c8: 0x37674136
 (gdb)
 
-0x7fffffffe5c8 est rsp soit (esp en 32bits) et les 4 octets suivant sont les octets de saved eip
+0x7fffffffe5c8 c'est rsp (esp en 32bits) et les 4 octets suivant sont les octets de saved eip
 
 https://wiremask.eu/tools/buffer-overflow-pattern-generator/
 0x37674136 == offset 200 donc on sait qu'il y auras 200octets avant de pouvoir overide eip
 
-(gdb) info functions
-...
+(gdb) info functions secret_backdoor 
+All functions matching regular expression "secret_backdoor":
+
+Non-debugging symbols:
 0x000055555555488c  secret_backdoor
-0x00005555555548c0  handle_msg
-0x0000555555554932  set_msg
-0x00005555555549cd  set_username
-0x0000555555554aa8  main
-...
+(gdb) 
 
-
-mais aslr est desactiver 
-level09@OverRide:~$ cat /proc/sys/kernel/randomize_va_space
-0
-
-0x000055555555488c  secret_backdoor
 
 donc on fait un script qui vas dans le username fill de 40 octets de 'A' puis 'ff' pour overide la var max_msg_len puis dans le message fill de NOPS et l'addr de la secret backdoor 
 

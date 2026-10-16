@@ -24,7 +24,7 @@ if (strcmp(buffer, "Congratulations!") == 0)
 Q premiere lettre de la string de base
 
 "Congratulations!"
-C premiere lettre transformer
+C premiere lettre de la string attendu
 
 buf + key = res
  Q  +     =  C
@@ -32,9 +32,9 @@ buf + key = res
 En binaire:
 01010001 + ? = 01000011
 
-Q= 01010001
-C= 01000011
-   00010010 = 18
+	 01010001(Q)
+	+00010010 == 18 en decimal
+	=01000011(C)
 
 18 est donc la valeur de difference entre la string original et la string attendu.
 
@@ -48,8 +48,6 @@ on donne donc 322424827 comme mdp qui se fait soustraire
 322424845 - 322424827 = 18
 
 Puis passe dans les cases attendue 18
-
-
 
 
 level03@OverRide:~$ ./level03

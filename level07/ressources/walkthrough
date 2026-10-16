@@ -160,9 +160,12 @@ Si l'on ajoute 2^30 à n'importe quel index, le produit par 4 entraînera une bo
 
 Donc 1073741935 permet donner 111 en bypassant le check du programme
 
+4294967296 == Uint max
+
 Offset = (1073741935 * 4) % 4294967296(1073741824*4) = 444 octets / 4 = 111
 
 1073741935 % 3 == 1 et != 0
+
 
 donc on a notre index 1073741935(111 avec bypass du %3)
 

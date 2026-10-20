@@ -27,10 +27,10 @@ level00@OverRide:~$
 
 ➜  override git:(main) ✗ scp -P 4242 level00@192.168.1.28:/home/users/level00/level00 ./bin/.
 
-puis decompilation avec https://dogbolt.org/ 
+puis décompilation avec https://dogbolt.org/ 
 
 
-Dans la decompilation on trouve le mdp en dure 5276
+Dans la decompilation on trouve le mdp en dur 5276
 
 
 on essaye:

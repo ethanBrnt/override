@@ -12,17 +12,17 @@ level06@OverRide:~$
 ➜  override git:(main) ✗ scp -P 4242 $level@192.168.1.28:/home/users/$level/$level ./bin/.
 
 https://dogbolt.org/?id=9f72fea8-183c-4bdc-9620-b88449bc2ae1#Boomerang=8&Ghidra=221&Hex-Rays=166&angr=63&Relyze=1&RetDec=22&Snowman=8332&BinaryNinja=176
-decompilation
+décompilation
 
 execution du code sur la machine hote en ajoutant la ligne 
 		printf("cal: %d\n", calculated_serial);
 
 
-apres avoir jouer avec le code source je comprend qu'en affichant simplement le calcul effectuer par le programme en utilisant mon login "eburnet"
-le serial calculer par le programme est "6233769"
-et si le serial entree par l'utilisateur est le meme que celui calculer par le programme alors on a acces au shell:
+après avoir joué avec le code source je comprends qu'en affichant simplement le calcul effectué par le programme en utilisant mon login "eburnet"
+le serial calculé par le programme est "6233769"
+et si le serial entree par l'utilisateur est le même que celui calculé par le programme alors on a accès au shell:
 		return serial != calculated_serial;
-return false et donc acces a "system("/bin/sh");"
+return false et donc accès à "system("/bin/sh");"
 
 	if (auth(login, serial))
 		return 1;
@@ -30,7 +30,7 @@ return false et donc acces a "system("/bin/sh");"
 	puts("Authenticated!");
 	system("/bin/sh");
 
-J'ai juste a utiliser les memes infos sur la machine.
+J'ai juste à utiliser les mêmes infos sur la machine.
 
 level06@OverRide:~$ ./level06
 ***********************************

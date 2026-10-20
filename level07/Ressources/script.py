@@ -41,7 +41,7 @@ time.sleep(0.1)
 sys.stdout.write("store\n")
 sys.stdout.flush()
 time.sleep(0.1)
-sys.stdout.write("4294956304\n") # Addresse du debut du tableau
+sys.stdout.write("4294956424\n")
 sys.stdout.flush()
 time.sleep(0.1)
 sys.stdout.write("1073741938\n") # dans la case 114 du tableau 
